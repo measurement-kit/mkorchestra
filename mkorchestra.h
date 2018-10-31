@@ -336,6 +336,7 @@ void mkorchestra_update_response_delete(
 }  // extern "C"
 
 #include <memory>
+#include <string>
 
 /// mkorchestra_metadata_deleter is a deleter for
 /// mkorchestra_metadata_t.
@@ -447,7 +448,6 @@ std::string mkorchestra_update_response_moveout_logs(
 // symbol. If you only care about API, you can stop reading here.
 #ifdef MKORCHESTRA_INLINE_IMPL
 
-#include <string>
 #include <vector>
 
 #include "json.hpp"
