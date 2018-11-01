@@ -152,7 +152,7 @@ void mkorchestra_register_request_delete(
 
 /// mkorchestra_register_response_good returns true if we received a response
 /// from the API and such response indicated success, false otherwise. It
-/// calls std::abort if @p response is a null pointer.
+/// calls abort if @p response is a null pointer.
 int64_t mkorchestra_register_response_good(
     const mkorchestra_register_response_t *response);
 
@@ -226,14 +226,14 @@ void mkorchestra_login_request_delete(mkorchestra_login_request_t *request);
 
 /// mkorchestra_login_response_good returns true if we received a response
 /// from the API and that response is successful, false otherwise. It
-/// calls std::abort if passed a null pointer argument.
+/// calls abort if passed a null pointer argument.
 int64_t mkorchestra_login_response_good(
     const mkorchestra_login_response_t *response);
 
 /// mkorchestra_login_response_get_expire returns when the authentication
 /// token will expire. It always returns a valid string owned by @p response,
 /// which MAY be an empty string if the request failed. This function will
-/// call std::abort if passed a null pointer.
+/// call abort if passed a null pointer.
 const char *mkorchestra_login_response_get_expire(
     const mkorchestra_login_response_t *response);
 
@@ -315,7 +315,7 @@ void mkorchestra_update_request_delete(
 
 /// mkorchestra_update_response_good returns true if we received a response
 /// from the API and such response indicated success, false otherwise. It
-/// calls std::abort if @p response is a null pointer.
+/// calls abort if @p response is a null pointer.
 int64_t mkorchestra_update_response_good(
     const mkorchestra_update_response_t *response);
 
@@ -481,7 +481,7 @@ void mkorchestra_metadata_set_available_bandwidth(
     mkorchestra_metadata_t *metadata,
     const char *available_bandwidth) {
   if (metadata == nullptr || available_bandwidth == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->available_bandwidth = available_bandwidth;
 }
@@ -490,7 +490,7 @@ void mkorchestra_metadata_set_device_token(
     mkorchestra_metadata_t *metadata,
     const char *device_token) {
   if (metadata == nullptr || device_token == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->device_token = device_token;
 }
@@ -499,7 +499,7 @@ void mkorchestra_metadata_set_language(
     mkorchestra_metadata_t *metadata,
     const char *language) {
   if (metadata == nullptr || language == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->language = language;
 }
@@ -508,7 +508,7 @@ void mkorchestra_metadata_set_network_type(
     mkorchestra_metadata_t *metadata,
     const char *network_type) {
   if (metadata == nullptr || network_type == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->network_type = network_type;
 }
@@ -517,7 +517,7 @@ void mkorchestra_metadata_set_platform(
     mkorchestra_metadata_t *metadata,
     const char *platform) {
   if (metadata == nullptr || platform == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->platform = platform;
 }
@@ -526,7 +526,7 @@ void mkorchestra_metadata_set_probe_asn(
     mkorchestra_metadata_t *metadata,
     const char *probe_asn) {
   if (metadata == nullptr || probe_asn == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->probe_asn = probe_asn;
 }
@@ -535,7 +535,7 @@ void mkorchestra_metadata_set_probe_cc(
     mkorchestra_metadata_t *metadata,
     const char *probe_cc) {
   if (metadata == nullptr || probe_cc == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->probe_cc = probe_cc;
 }
@@ -544,7 +544,7 @@ void mkorchestra_metadata_set_probe_family(
     mkorchestra_metadata_t *metadata,
     const char *probe_family) {
   if (metadata == nullptr || probe_family == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->probe_family = probe_family;
 }
@@ -553,7 +553,7 @@ void mkorchestra_metadata_set_probe_timezone(
     mkorchestra_metadata_t *metadata,
     const char *probe_timezone) {
   if (metadata == nullptr || probe_timezone == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->probe_timezone = probe_timezone;
 }
@@ -562,7 +562,7 @@ void mkorchestra_metadata_set_software_name(
     mkorchestra_metadata_t *metadata,
     const char *software_name) {
   if (metadata == nullptr || software_name == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->software_name = software_name;
 }
@@ -571,7 +571,7 @@ void mkorchestra_metadata_set_software_version(
     mkorchestra_metadata_t *metadata,
     const char *software_version) {
   if (metadata == nullptr || software_version == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->software_version = software_version;
 }
@@ -580,7 +580,7 @@ void mkorchestra_metadata_add_supported_test(
     mkorchestra_metadata_t *metadata,
     const char *supported_test) {
   if (metadata == nullptr || supported_test == nullptr) {
-    std::abort();
+    abort();
   }
   metadata->supported_tests.push_back(supported_test);
 }
@@ -612,7 +612,7 @@ void mkorchestra_register_request_set_password(
     mkorchestra_register_request_t *request,
     const char *password) {
   if (request == nullptr || password == nullptr) {
-    std::abort();
+    abort();
   }
   request->password = password;
 }
@@ -621,7 +621,7 @@ void mkorchestra_register_request_set_metadata(
     mkorchestra_register_request_t *request,
     const mkorchestra_metadata_t *metadata) {
   if (request == nullptr || metadata == nullptr) {
-    std::abort();
+    abort();
   }
   request->metadata = *metadata;  // Make a copy
 }
@@ -629,7 +629,7 @@ void mkorchestra_register_request_set_metadata(
 void mkorchestra_register_request_set_base_url(
     mkorchestra_register_request_t *request, const char *base_url) {
   if (request == nullptr || base_url == nullptr) {
-    std::abort();
+    abort();
   }
   request->base_url = base_url;
 }
@@ -638,7 +638,7 @@ void mkorchestra_register_request_set_ca_bundle_path(
     mkorchestra_register_request_t *request,
     const char *ca_bundle_path) {
   if (request == nullptr || ca_bundle_path == nullptr) {
-    std::abort();
+    abort();
   }
   request->ca_bundle_path = ca_bundle_path;
 }
@@ -647,7 +647,7 @@ void mkorchestra_register_request_set_timeout(
     mkorchestra_register_request_t *request,
     int64_t timeout) {
   if (request == nullptr) {
-    std::abort();
+    abort();
   }
   request->timeout = timeout;
 }
@@ -655,7 +655,7 @@ void mkorchestra_register_request_set_timeout(
 mkorchestra_register_response_t *mkorchestra_register_request_perform_nonnull(
     const mkorchestra_register_request_t *request) {
   if (request == nullptr) {
-    std::abort();
+    abort();
   }
   mkorchestra_register_response_uptr response{
       new mkorchestra_register_response_t};  // new cannot fail
@@ -731,7 +731,7 @@ void mkorchestra_register_request_delete(
 int64_t mkorchestra_register_response_good(
     const mkorchestra_register_response_t *response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return response->good;
 }
@@ -739,7 +739,7 @@ int64_t mkorchestra_register_response_good(
 const char *mkorchestra_register_response_get_client_id(
     const mkorchestra_register_response_t *response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return response->client_id.c_str();
 }
@@ -748,7 +748,7 @@ void mkorchestra_register_response_get_binary_logs(
     const mkorchestra_register_response_t *response,
     const uint8_t **data, size_t *count) {
   if (response == nullptr || data == nullptr || count == nullptr) {
-    std::abort();
+    abort();
   }
   *data = (const uint8_t *)response->logs.c_str();
   *count = response->logs.size();
@@ -782,7 +782,7 @@ void mkorchestra_login_request_set_username(
     mkorchestra_login_request_t *request,
     const char *username) {
   if (request == nullptr || username == nullptr) {
-    std::abort();
+    abort();
   }
   request->username = username;
 }
@@ -791,7 +791,7 @@ void mkorchestra_login_request_set_password(
     mkorchestra_login_request_t *request,
     const char *password) {
   if (request == nullptr || password == nullptr) {
-    std::abort();
+    abort();
   }
   request->password = password;
 }
@@ -799,7 +799,7 @@ void mkorchestra_login_request_set_password(
 void mkorchestra_login_request_set_base_url(
     mkorchestra_login_request_t *request, const char *base_url) {
   if (request == nullptr || base_url == nullptr) {
-    std::abort();
+    abort();
   }
   request->base_url = base_url;
 }
@@ -808,7 +808,7 @@ void mkorchestra_login_request_set_ca_bundle_path(
     mkorchestra_login_request_t *request,
     const char *ca_bundle_path) {
   if (request == nullptr || ca_bundle_path == nullptr) {
-    std::abort();
+    abort();
   }
   request->ca_bundle_path = ca_bundle_path;
 }
@@ -817,7 +817,7 @@ void mkorchestra_login_request_set_timeout(
     mkorchestra_login_request_t *request,
     int64_t timeout) {
   if (request == nullptr) {
-    std::abort();
+    abort();
   }
   request->timeout = timeout;
 }
@@ -825,7 +825,7 @@ void mkorchestra_login_request_set_timeout(
 mkorchestra_login_response_t *mkorchestra_login_request_perform_nonnull(
     const mkorchestra_login_request_t *request) {
   if (request == nullptr) {
-    std::abort();
+    abort();
   }
   mkorchestra_login_response_uptr response{
     new mkorchestra_login_response_t};  // new cannot fail
@@ -894,7 +894,7 @@ void mkorchestra_login_request_delete(mkorchestra_login_request_t *request) {
 int64_t mkorchestra_login_response_good(
     const mkorchestra_login_response_t *response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return response->good;
 }
@@ -902,7 +902,7 @@ int64_t mkorchestra_login_response_good(
 const char *mkorchestra_login_response_get_expire(
     const mkorchestra_login_response_t *response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return response->expire.c_str();
 }
@@ -910,7 +910,7 @@ const char *mkorchestra_login_response_get_expire(
 const char *mkorchestra_login_response_get_token(
     const mkorchestra_login_response_t *response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return response->token.c_str();
 }
@@ -942,7 +942,7 @@ void mkorchestra_update_request_set_token(
     mkorchestra_update_request_t *request,
     const char *token) {
   if (request == nullptr || token == nullptr) {
-    std::abort();
+    abort();
   }
   request->token = token;
 }
@@ -951,7 +951,7 @@ void mkorchestra_update_request_set_client_id(
     mkorchestra_update_request_t *request,
     const char *client_id) {
   if (request == nullptr || client_id == nullptr) {
-    std::abort();
+    abort();
   }
   request->client_id = client_id;
 }
@@ -960,7 +960,7 @@ void mkorchestra_update_request_set_metadata(
     mkorchestra_update_request_t *request,
     const mkorchestra_metadata_t *metadata) {
   if (request == nullptr || metadata == nullptr) {
-    std::abort();
+    abort();
   }
   request->metadata = *metadata;  // Make a copy
 }
@@ -968,7 +968,7 @@ void mkorchestra_update_request_set_metadata(
 void mkorchestra_update_request_set_base_url(
     mkorchestra_update_request_t *request, const char *base_url) {
   if (request == nullptr || base_url == nullptr) {
-    std::abort();
+    abort();
   }
   request->base_url = base_url;
 }
@@ -977,7 +977,7 @@ void mkorchestra_update_request_set_ca_bundle_path(
     mkorchestra_update_request_t *request,
     const char *ca_bundle_path) {
   if (request == nullptr || ca_bundle_path == nullptr) {
-    std::abort();
+    abort();
   }
   request->ca_bundle_path = ca_bundle_path;
 }
@@ -986,7 +986,7 @@ void mkorchestra_update_request_set_timeout(
     mkorchestra_update_request_t *request,
     int64_t timeout) {
   if (request == nullptr) {
-    std::abort();
+    abort();
   }
   request->timeout = timeout;
 }
@@ -994,7 +994,7 @@ void mkorchestra_update_request_set_timeout(
 mkorchestra_update_response_t *mkorchestra_update_request_perform_nonnull(
     const mkorchestra_update_request_t *request) {
   if (request == nullptr) {
-    std::abort();
+    abort();
   }
   mkorchestra_update_response_uptr response{
       new mkorchestra_update_response_t};  // new cannot fail
@@ -1066,7 +1066,7 @@ void mkorchestra_update_request_delete(
 int64_t mkorchestra_update_response_good(
     const mkorchestra_update_response_t *response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return response->good;
 }
@@ -1075,7 +1075,7 @@ void mkorchestra_update_response_get_binary_logs(
     const mkorchestra_update_response_t *response,
     const uint8_t **data, size_t *count) {
   if (response == nullptr || data == nullptr || count == nullptr) {
-    std::abort();
+    abort();
   }
   *data = (const uint8_t *)response->logs.c_str();
   *count = response->logs.size();
@@ -1089,7 +1089,7 @@ void mkorchestra_update_response_delete(
 std::string mkorchestra_register_response_moveout_logs(
     mkorchestra_register_response_uptr &response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return std::move(response->logs);
 }
@@ -1097,7 +1097,7 @@ std::string mkorchestra_register_response_moveout_logs(
 std::string mkorchestra_login_response_moveout_logs(
     mkorchestra_login_response_uptr &response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return std::move(response->logs);
 }
@@ -1105,7 +1105,7 @@ std::string mkorchestra_login_response_moveout_logs(
 std::string mkorchestra_update_response_moveout_logs(
     mkorchestra_update_response_uptr &response) {
   if (response == nullptr) {
-    std::abort();
+    abort();
   }
   return std::move(response->logs);
 }
