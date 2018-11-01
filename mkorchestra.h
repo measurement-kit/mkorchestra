@@ -405,6 +405,80 @@ void mkorchestra_collectors_response_get_binary_logs(
 void mkorchestra_collectors_response_delete(
     mkorchestra_collectors_response_t *response);
 
+/// mkorchestra_ths_request_t is a request for the test-helpers API.
+typedef struct mkorchestra_ths_request mkorchestra_ths_request_t;
+
+/// mkorchestra_ths_response_t is a response for the test-helpers API.
+typedef struct mkorchestra_ths_response mkorchestra_ths_response_t;
+
+/// mkorchestra_ths_request_new_nonnull creates a new request for the
+/// test-helpers endpoint. The returned pointer is always valid. This function
+/// calls abort if allocating new memory fails.
+mkorchestra_ths_request_t *
+mkorchestra_ths_request_new_nonnull(void);
+
+/// mkorchestra_ths_request_set_base_url sets the base URL for
+/// the @p request. It aborts if passed any null pointer.
+void mkorchestra_ths_request_set_base_url(
+    mkorchestra_ths_request_t *request,
+    const char *base_url);
+
+/// mkorchestra_ths_request_set_ca_bundle_path sets the CA bundle
+/// path. Required on mobile. Aborts if passed null arguments.
+void mkorchestra_ths_request_set_ca_bundle_path(
+    mkorchestra_ths_request_t *request,
+    const char *ca_bundle_path);
+
+/// mkorchestra_ths_request_set_timeout sets the timeout. After that time has
+/// expired, the request will fail. It aborts if passed null arguments.
+void mkorchestra_ths_request_set_timeout(
+    mkorchestra_ths_request_t *request,
+    int64_t timeout);
+
+/// mkorchestra_ths_request_perform_nonnull performs @p request. It
+/// always returns a valid pointer. It aborts if allocation fails.
+mkorchestra_ths_response_t *
+mkorchestra_ths_request_perform_nonnull(
+    const mkorchestra_ths_request_t *request);
+
+/// mkorchestra_ths_request_delete destroys @p request. Note that
+/// @p request MAY be a null pointer.
+void mkorchestra_ths_request_delete(
+    mkorchestra_ths_request_t *request);
+
+/// mkorchestra_ths_response_good returns true if we received a response
+/// from the API and such response indicated success, false otherwise. It
+/// calls abort if @p response is a null pointer.
+int64_t mkorchestra_ths_response_good(
+    const mkorchestra_ths_response_t *response);
+
+/// mkorchestra_ths_response_get_wchttpsths_size
+/// returns the number of available https Web Connectivity ths. This
+/// function aborts if passed a null pointer @p response.
+size_t mkorchestra_ths_response_get_wchttpsths_size(
+    const mkorchestra_ths_response_t *response);
+
+/// mkorchestra_ths_response_get_wchttpsth_at
+/// returns the https Web Connectivity test helper at index @p idx. If there is
+/// no helper for such index, this function returns the empty string. The
+/// returned string is owned by the @p response instance. This function aborts
+/// if passed a null @p response.
+const char *mkorchestra_ths_response_get_wchttpsth_at(
+    const mkorchestra_ths_response_t *response, size_t idx);
+
+/// mkorchestra_ths_response_get_binary_logs returns the (possibly
+/// non UTF-8) logs in @p data and @p count. The byte array returned in @p
+/// data is owned by @p response and becomes invalid after @p response
+/// is deleted. It aborts if passed any null pointer argument.
+void mkorchestra_ths_response_get_binary_logs(
+    const mkorchestra_ths_response_t *response,
+    const uint8_t **data, size_t *count);
+
+/// mkorchestra_ths_response_delete destroys @p response. Note that
+/// @p response MAY be a null pointer.
+void mkorchestra_ths_response_delete(
+    mkorchestra_ths_response_t *response);
+
 #ifdef __cplusplus
 }  // extern "C"
 
@@ -528,6 +602,32 @@ struct mkorchestra_collectors_response_deleter {
 using mkorchestra_collectors_response_uptr = std::unique_ptr<
     mkorchestra_collectors_response_t, mkorchestra_collectors_response_deleter>;
 
+/// mkorchestra_ths_request_deleter is a deleter for
+/// mkorchestra_ths_request_t.
+struct mkorchestra_ths_request_deleter {
+  void operator()(mkorchestra_ths_request_t *s) {
+    mkorchestra_ths_request_delete(s);
+  }
+};
+
+/// mkorchestra_ths_request_uptr is a unique pointer to a
+/// mkorchestra_ths_request_t instance.
+using mkorchestra_ths_request_uptr = std::unique_ptr<
+    mkorchestra_ths_request_t, mkorchestra_ths_request_deleter>;
+
+/// mkorchestra_ths_response_deleter is a deleter for
+/// mkorchestra_ths_response_t.
+struct mkorchestra_ths_response_deleter {
+  void operator()(mkorchestra_ths_response_t *s) {
+    mkorchestra_ths_response_delete(s);
+  }
+};
+
+/// mkorchestra_ths_response_uptr is a unique pointer to a
+/// mkorchestra_ths_response_t instance.
+using mkorchestra_ths_response_uptr = std::unique_ptr<
+    mkorchestra_ths_response_t, mkorchestra_ths_response_deleter>;
+
 /// mkorchestra_register_response_moveout_logs moves the logs out of
 /// @p response. It aborts if passed a null pointer.
 std::string mkorchestra_register_response_moveout_logs(
@@ -547,6 +647,11 @@ std::string mkorchestra_update_response_moveout_logs(
 /// @p response. It aborts if passed a null pointer.
 std::string mkorchestra_collectors_response_moveout_logs(
     mkorchestra_collectors_response_uptr &response);
+
+/// mkorchestra_ths_response_moveout_logs moves the logs out of
+/// @p response. It aborts if passed a null pointer.
+std::string mkorchestra_ths_response_moveout_logs(
+    mkorchestra_ths_response_uptr &response);
 
 // The implementation can be included inline by defining this preprocessor
 // symbol. If you only care about API, you can stop reading here.
@@ -1327,6 +1432,148 @@ void mkorchestra_collectors_response_delete(
   delete response;
 }
 
+struct mkorchestra_ths_request {
+  std::string base_url;
+  std::string ca_bundle_path;
+  int64_t timeout = 30;
+};
+
+struct mkorchestra_ths_response {
+  int64_t good = false;
+  std::vector<std::string> wchttpsths;  // Web Connectivity https ths
+  std::string logs;
+};
+
+mkorchestra_ths_request_t *
+mkorchestra_ths_request_new_nonnull() {
+  return new mkorchestra_ths_request_t;
+}
+
+void mkorchestra_ths_request_set_base_url(
+    mkorchestra_ths_request_t *request,
+    const char *base_url) {
+  if (request == nullptr || base_url == nullptr) {
+    abort();
+  }
+  request->base_url = base_url;
+}
+
+void mkorchestra_ths_request_set_ca_bundle_path(
+    mkorchestra_ths_request_t *request,
+    const char *ca_bundle_path) {
+  if (request == nullptr || ca_bundle_path == nullptr) {
+    abort();
+  }
+  request->ca_bundle_path = ca_bundle_path;
+}
+
+void mkorchestra_ths_request_set_timeout(
+    mkorchestra_ths_request_t *request,
+    int64_t timeout) {
+  if (request == nullptr) {
+    abort();
+  }
+  request->timeout = timeout;
+}
+
+mkorchestra_ths_response_t *
+mkorchestra_ths_request_perform_nonnull(
+    const mkorchestra_ths_request_t *request) {
+  if (request == nullptr) {
+    abort();
+  }
+  mkorchestra_ths_response_uptr response{
+      new mkorchestra_ths_response_t};  // new cannot fail
+  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
+  mkcurl_request_set_ca_bundle_path_v2(
+      curl_request.get(), request->ca_bundle_path.c_str());
+  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
+  {
+    std::string url = request->base_url;
+    url += "/api/v1/test-helpers";
+    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+  }
+  mkcurl_response_uptr curl_response{
+      mkcurl_request_perform_nonnull(curl_request.get())};
+  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
+  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+    return response.release();
+  }
+  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+    return response.release();
+  }
+  {
+    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    response->logs += "Response body: ";
+    response->logs += body;
+    response->logs += "\n";
+    try {
+      nlohmann::json doc = nlohmann::json::parse(body);
+      for (auto entry : doc.at("results")) {
+        if (entry.at("name") == "web-connectivity") {
+          if (entry.at("type") == "https") {
+            response->wchttpsths.push_back(entry.at("address"));
+          } else if (entry.at("address") == "https") {
+            response->logs += "Working around ooni/orchestra#54 issue.\n";
+            response->wchttpsths.push_back(entry.at("type"));
+          }
+        }
+      }
+    } catch (const std::exception &exc) {
+      response->logs += exc.what();
+      response->logs += "\n";
+      return response.release();
+    }
+  }
+  response->good = true;
+  return response.release();
+}
+
+void mkorchestra_ths_request_delete(
+    mkorchestra_ths_request_t *request) {
+  delete request;
+}
+
+int64_t mkorchestra_ths_response_good(
+    const mkorchestra_ths_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->good;
+}
+
+size_t mkorchestra_ths_response_get_wchttpsths_size(
+    const mkorchestra_ths_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->wchttpsths.size();
+}
+
+const char *mkorchestra_ths_response_get_wchttpsth_at(
+    const mkorchestra_ths_response_t *response, size_t idx) {
+  if (response == nullptr) {
+    abort();
+  }
+  if (idx >= response->wchttpsths.size()) return "";
+  return response->wchttpsths[idx].c_str();
+}
+
+void mkorchestra_ths_response_get_binary_logs(
+    const mkorchestra_ths_response_t *response,
+    const uint8_t **data, size_t *count) {
+  if (response == nullptr || data == nullptr || count == nullptr) {
+    abort();
+  }
+  *data = (const uint8_t *)response->logs.c_str();
+  *count = response->logs.size();
+}
+
+void mkorchestra_ths_response_delete(
+    mkorchestra_ths_response_t *response) {
+  delete response;
+}
+
 std::string mkorchestra_register_response_moveout_logs(
     mkorchestra_register_response_uptr &response) {
   if (response == nullptr) {
@@ -1353,6 +1600,14 @@ std::string mkorchestra_update_response_moveout_logs(
 
 std::string mkorchestra_collectors_response_moveout_logs(
     mkorchestra_collectors_response_uptr &response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return std::move(response->logs);
+}
+
+std::string mkorchestra_ths_response_moveout_logs(
+    mkorchestra_ths_response_uptr &response) {
   if (response == nullptr) {
     abort();
   }

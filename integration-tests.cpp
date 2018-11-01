@@ -150,3 +150,29 @@ TEST_CASE("We can get the available HTTPS collectors") {
         re.get(), i) << std::endl;
   }
 }
+
+TEST_CASE("We can get the available HTTPS test-helpers") {
+  mkorchestra_ths_request_uptr r{
+      mkorchestra_ths_request_new_nonnull()};
+  mkorchestra_ths_request_set_base_url(
+      r.get(), events_baseurl().c_str());
+  mkorchestra_ths_request_set_ca_bundle_path(
+      r.get(), "ca-bundle.pem");
+  mkorchestra_ths_request_set_timeout(r.get(), 14);
+  mkorchestra_ths_response_uptr re{
+      mkorchestra_ths_request_perform_nonnull(r.get())};
+  {
+    std::string logs = mkorchestra_ths_response_moveout_logs(re);
+    REQUIRE(logs.size() > 0);
+    std::clog << "=== BEGIN UPDATE LOGS ===" << std::endl;
+    std::clog << logs;
+    std::clog << "=== END UPDATE LOGS ===" << std::endl;
+  }
+  REQUIRE(mkorchestra_ths_response_good(re.get()));
+  for (size_t i = 0;
+      i < mkorchestra_ths_response_get_wchttpsths_size(re.get());
+      ++i) {
+    std::clog << mkorchestra_ths_response_get_wchttpsth_at(
+        re.get(), i) << std::endl;
+  }
+}
