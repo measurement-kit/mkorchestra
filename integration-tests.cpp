@@ -144,6 +144,7 @@ TEST_CASE("We can get the available collectors") {
   }
   REQUIRE(mkorchestra_collectors_response_good(re.get()));
   size_t n = mkorchestra_collectors_response_get_collectors_size(re.get());
+  REQUIRE(n > 0);
   for (size_t i = 0; i < n; ++i) {
     mkorchestra_collector_uptr c;
     c.reset(mkorchestra_collectors_response_get_collector_at(re.get(), i));
