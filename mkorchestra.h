@@ -332,6 +332,20 @@ void mkorchestra_update_response_get_binary_logs(
 void mkorchestra_update_response_delete(
     mkorchestra_update_response_t *response);
 
+/// mkorchestra_collector_t is a collector.
+typedef struct mkorchestra_collector mkorchestra_collector_t;
+
+/// mkorchestra_collector_get_type returns the collector type. It always
+/// returns a valid string. Aborts if passed a null pointer.
+const char *mkorchestra_collector_get_type(const mkorchestra_collector_t *c);
+
+/// mkorchestra_collector_get_address returns the collector address. It always
+/// returns a valid string. Aborts if passed a null pointer.
+const char *mkorchestra_collector_get_address(const mkorchestra_collector_t *c);
+
+/// mkorchestra_collector_delete delets @p c, which MAY be null.
+void mkorchestra_collector_delete(mkorchestra_collector_t *c);
+
 /// mkorchestra_collectors_request_t is a request for the collectors API.
 typedef struct mkorchestra_collectors_request mkorchestra_collectors_request_t;
 
@@ -379,17 +393,17 @@ void mkorchestra_collectors_request_delete(
 int64_t mkorchestra_collectors_response_good(
     const mkorchestra_collectors_response_t *response);
 
-/// mkorchestra_collectors_response_get_https_collectors_size returns the
-/// number of available https collectors. This function aborts if passed
+/// mkorchestra_collectors_response_get_collectors_size returns the
+/// number of available collectors. This function aborts if passed
 /// a null pointer @p response.
-size_t mkorchestra_collectors_response_get_https_collectors_size(
+size_t mkorchestra_collectors_response_get_collectors_size(
     const mkorchestra_collectors_response_t *response);
 
-/// mkorchestra_collectors_response_get_https_collector_at returns the https
-/// collector at index @p idx. If there is no collector for such index, this
-/// function returns the empty string. The returned string is owned by the @p
-/// response instance. This function aborts if passed a null @p response.
-const char *mkorchestra_collectors_response_get_https_collector_at(
+/// mkorchestra_collectors_response_get_collector_at returns the
+/// collector at index @p idx. It never returns an invalid or null
+/// pointer. This function aborts if passed a null @p response or
+/// if the provided @p idx is out of range.
+mkorchestra_collector_t *mkorchestra_collectors_response_get_collector_at(
     const mkorchestra_collectors_response_t *response, size_t idx);
 
 /// mkorchestra_collectors_response_get_binary_logs returns the (possibly
@@ -594,6 +608,19 @@ struct mkorchestra_update_response_deleter {
 /// mkorchestra_update_response_t instance.
 using mkorchestra_update_response_uptr = std::unique_ptr<
     mkorchestra_update_response_t, mkorchestra_update_response_deleter>;
+
+/// mkorchestra_collector_deleter is a deleter for
+/// mkorchestra_collector_t.
+struct mkorchestra_collector_deleter {
+  void operator()(mkorchestra_collector_t *s) {
+    mkorchestra_collector_delete(s);
+  }
+};
+
+/// mkorchestra_collector_uptr is a unique pointer to a
+/// mkorchestra_collector_t instance.
+using mkorchestra_collector_uptr = std::unique_ptr<
+    mkorchestra_collector_t, mkorchestra_collector_deleter>;
 
 /// mkorchestra_collectors_request_deleter is a deleter for
 /// mkorchestra_collectors_request_t.
@@ -1327,6 +1354,28 @@ void mkorchestra_update_response_delete(
   delete response;
 }
 
+struct mkorchestra_collector {
+  std::string type;
+  std::string address;
+};
+
+const char *mkorchestra_collector_get_type(const mkorchestra_collector_t *c) {
+  if (c == nullptr) {
+    abort();
+  }
+  return c->type.c_str();
+}
+
+const char *mkorchestra_collector_get_address(
+    const mkorchestra_collector_t *c) {
+  if (c == nullptr) {
+    abort();
+  }
+  return c->address.c_str();
+}
+
+void mkorchestra_collector_delete(mkorchestra_collector_t *c) { delete c; }
+
 struct mkorchestra_collectors_request {
   std::string base_url;
   std::string ca_bundle_path;
@@ -1335,7 +1384,7 @@ struct mkorchestra_collectors_request {
 
 struct mkorchestra_collectors_response {
   int64_t good = false;
-  std::vector<std::string> https_collectors;
+  std::vector<mkorchestra_collector_uptr> collectors;
   std::string logs;
 };
 
@@ -1405,9 +1454,10 @@ mkorchestra_collectors_request_perform_nonnull(
     try {
       nlohmann::json doc = nlohmann::json::parse(body);
       for (auto entry : doc.at("results")) {
-        if (entry.at("type") == "https") {
-          response->https_collectors.push_back(entry.at("address"));
-        }
+        mkorchestra_collector_uptr c{new mkorchestra_collector_t};
+        c->address = entry.at("address");
+        c->type = entry.at("type");
+        response->collectors.push_back(std::move(c));
       }
     } catch (const std::exception &exc) {
       response->logs += exc.what();
@@ -1432,21 +1482,22 @@ int64_t mkorchestra_collectors_response_good(
   return response->good;
 }
 
-size_t mkorchestra_collectors_response_get_https_collectors_size(
+size_t mkorchestra_collectors_response_get_collectors_size(
     const mkorchestra_collectors_response_t *response) {
   if (response == nullptr) {
     abort();
   }
-  return response->https_collectors.size();
+  return response->collectors.size();
 }
 
-const char *mkorchestra_collectors_response_get_https_collector_at(
+mkorchestra_collector_t *mkorchestra_collectors_response_get_collector_at(
     const mkorchestra_collectors_response_t *response, size_t idx) {
-  if (response == nullptr) {
+  if (response == nullptr || idx >= response->collectors.size()) {
     abort();
   }
-  if (idx >= response->https_collectors.size()) return "";
-  return response->https_collectors[idx].c_str();
+  mkorchestra_collector_uptr c{new mkorchestra_collector_t};
+  *c = *response->collectors[idx];
+  return c.release();
 }
 
 void mkorchestra_collectors_response_get_binary_logs(

@@ -125,7 +125,7 @@ static std::string events_baseurl() {
   return "https://events.proteus.test.ooni.io";
 }
 
-TEST_CASE("We can get the available HTTPS collectors") {
+TEST_CASE("We can get the available collectors") {
   mkorchestra_collectors_request_uptr r{
       mkorchestra_collectors_request_new_nonnull()};
   mkorchestra_collectors_request_set_base_url(
@@ -143,11 +143,15 @@ TEST_CASE("We can get the available HTTPS collectors") {
     std::clog << "=== END UPDATE LOGS ===" << std::endl;
   }
   REQUIRE(mkorchestra_collectors_response_good(re.get()));
-  for (size_t i = 0;
-      i < mkorchestra_collectors_response_get_https_collectors_size(re.get());
-      ++i) {
-    std::clog << mkorchestra_collectors_response_get_https_collector_at(
-        re.get(), i) << std::endl;
+  size_t n = mkorchestra_collectors_response_get_collectors_size(re.get());
+  for (size_t i = 0; i < n; ++i) {
+    mkorchestra_collector_uptr c;
+    c.reset(mkorchestra_collectors_response_get_collector_at(re.get(), i));
+    std::clog << "type: "
+              << mkorchestra_collector_get_type(c.get())
+              << " address: "
+              << mkorchestra_collector_get_address(c.get())
+              << std::endl;
   }
 }
 
