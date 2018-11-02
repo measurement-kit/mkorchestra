@@ -125,7 +125,7 @@ static std::string events_baseurl() {
   return "https://events.proteus.test.ooni.io";
 }
 
-TEST_CASE("We can get the available HTTPS collectors") {
+TEST_CASE("We can get the available collectors") {
   mkorchestra_collectors_request_uptr r{
       mkorchestra_collectors_request_new_nonnull()};
   mkorchestra_collectors_request_set_base_url(
@@ -143,36 +143,48 @@ TEST_CASE("We can get the available HTTPS collectors") {
     std::clog << "=== END UPDATE LOGS ===" << std::endl;
   }
   REQUIRE(mkorchestra_collectors_response_good(re.get()));
-  for (size_t i = 0;
-      i < mkorchestra_collectors_response_get_https_collectors_size(re.get());
-      ++i) {
-    std::clog << mkorchestra_collectors_response_get_https_collector_at(
-        re.get(), i) << std::endl;
+  size_t n = mkorchestra_collectors_response_get_collectors_size(re.get());
+  REQUIRE(n > 0);
+  for (size_t i = 0; i < n; ++i) {
+    mkorchestra_collector_uptr c;
+    c.reset(mkorchestra_collectors_response_get_collector_at(re.get(), i));
+    std::clog << "type: "
+              << mkorchestra_collector_get_type(c.get())
+              << " address: "
+              << mkorchestra_collector_get_address(c.get())
+              << std::endl;
   }
 }
 
-TEST_CASE("We can get the available HTTPS test-helpers") {
-  mkorchestra_ths_request_uptr r{
-      mkorchestra_ths_request_new_nonnull()};
-  mkorchestra_ths_request_set_base_url(
+TEST_CASE("We can get the available test-helpers") {
+  mkorchestra_testhelpers_request_uptr r{
+      mkorchestra_testhelpers_request_new_nonnull()};
+  mkorchestra_testhelpers_request_set_base_url(
       r.get(), events_baseurl().c_str());
-  mkorchestra_ths_request_set_ca_bundle_path(
+  mkorchestra_testhelpers_request_set_ca_bundle_path(
       r.get(), "ca-bundle.pem");
-  mkorchestra_ths_request_set_timeout(r.get(), 14);
-  mkorchestra_ths_response_uptr re{
-      mkorchestra_ths_request_perform_nonnull(r.get())};
+  mkorchestra_testhelpers_request_set_timeout(r.get(), 14);
+  mkorchestra_testhelpers_response_uptr re{
+      mkorchestra_testhelpers_request_perform_nonnull(r.get())};
   {
-    std::string logs = mkorchestra_ths_response_moveout_logs(re);
+    std::string logs = mkorchestra_testhelpers_response_moveout_logs(re);
     REQUIRE(logs.size() > 0);
     std::clog << "=== BEGIN UPDATE LOGS ===" << std::endl;
     std::clog << logs;
     std::clog << "=== END UPDATE LOGS ===" << std::endl;
   }
-  REQUIRE(mkorchestra_ths_response_good(re.get()));
-  for (size_t i = 0;
-      i < mkorchestra_ths_response_get_wchttpsths_size(re.get());
-      ++i) {
-    std::clog << mkorchestra_ths_response_get_wchttpsth_at(
-        re.get(), i) << std::endl;
+  REQUIRE(mkorchestra_testhelpers_response_good(re.get()));
+  size_t n = mkorchestra_testhelpers_response_get_testhelpers_size(re.get());
+  REQUIRE(n > 0);
+  for (size_t i = 0; i < n; ++i) {
+    mkorchestra_testhelper_uptr th;
+    th.reset(mkorchestra_testhelpers_response_get_testhelper_at(re.get(), i));
+    std::clog << "- name: "
+              << mkorchestra_testhelper_get_name(th.get())
+              << " type: "
+              << mkorchestra_testhelper_get_type(th.get())
+              << " address: "
+              << mkorchestra_testhelper_get_address(th.get())
+              << std::endl;
   }
 }
