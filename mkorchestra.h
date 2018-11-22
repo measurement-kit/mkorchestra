@@ -1957,7 +1957,7 @@ static bool urls_make_query_string(const mkorchestra_urls_request_t *request,
     std::map<std::string, std::string> map;
     {
       // match checks whether @p s makes sense. Here the concern is not to
-      // precisely validates the codes but to guarantee that there are no
+      // precisely validate the codes but to guarantee that there are no
       // unexpected characters requiring escaping of the query.
       auto match = [](const std::string &s) -> bool {
         std::smatch match;
