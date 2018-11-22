@@ -512,10 +512,140 @@ void mkorchestra_testhelpers_response_get_binary_logs(
 void mkorchestra_testhelpers_response_delete(
     mkorchestra_testhelpers_response_t *response);
 
+/// mkorchestra_urls_request_t is a request to the urls API.
+typedef struct mkorchestra_urls_request mkorchestra_urls_request_t;
+
+/// mkorchestra_urls_response_t is a response from the urls API.
+typedef struct mkorchestra_urls_response mkorchestra_urls_response_t;
+
+/// mkorchestra_urls_request_new_nonnull creates a new urls request. It will
+/// always return a valid pointer and will abort if out of memory.
+mkorchestra_urls_request_t *mkorchestra_urls_request_new_nonnull(void);
+
+/// mkorchestra_urls_request_set_limit sets the maximum number of URLs to
+/// return in a page. It will abort if passed any null pointer argument.
+void mkorchestra_urls_request_set_limit(
+    mkorchestra_urls_request_t *request,
+    int64_t limit);
+
+/// mkorchestra_urls_request_set_country_code sets the country code. It
+/// will abort if passed any null pointer argument.
+void mkorchestra_urls_request_set_country_code(
+    mkorchestra_urls_request_t *request,
+    const char *country_code);
+
+/// mkorchestra_urls_request_add_category_code adds a URL category. It
+/// will abort if passed any null pointer argument.
+void mkorchestra_urls_request_add_category_code(
+    mkorchestra_urls_request_t *request,
+    const char *category_code);
+
+/// mkorchestra_urls_request_set_base_url sets the base URL for
+/// the @p request. It will abort if passed null pointers.
+void mkorchestra_urls_request_set_base_url(
+    mkorchestra_urls_request_t *request,
+    const char *base_url);
+
+/// mkorchestra_urls_request_set_ca_bundle_path sets the CA bundle
+/// path. Required on mobile. Aborts if passed null arguments.
+void mkorchestra_urls_request_set_ca_bundle_path(
+    mkorchestra_urls_request_t *request,
+    const char *ca_bundle_path);
+
+/// mkorchestra_urls_request_set_timeout sets the timeout. After that time has
+/// expired, the request will fail. It aborts if passed null arguments.
+void mkorchestra_urls_request_set_timeout(
+    mkorchestra_urls_request_t *request,
+    int64_t timeout);
+
+/// mkorchestra_urls_request_perform_nonnull performs @p request. It will
+/// always return a valid pointer. It aborts if passed a null @p request.
+mkorchestra_urls_response_t *mkorchestra_urls_request_perform_nonnull(
+    const mkorchestra_urls_request_t *request);
+
+/// mkorchestra_urls_request_delete destroys @p request. Note that @p
+/// request MAY be a null pointer.
+void mkorchestra_urls_request_delete(mkorchestra_urls_request_t *request);
+
+/// mkorchestra_urls_response_good returns true if we received a response
+/// from the API and that response is successful, false otherwise. It
+/// calls abort if passed a null pointer argument.
+int64_t mkorchestra_urls_response_good(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_metadata_count returns the count field of
+/// the metadata. This function will call abort if passed a null pointer.
+int64_t mkorchestra_urls_response_get_metadata_count(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_metadata_current_page returns the current
+/// page field of the metadata. It will abort if passed a null pointer.
+int64_t mkorchestra_urls_response_get_metadata_current_page(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_metadata_limit returns the limit field of
+/// the metadata. It will abort if passed a null pointer.
+int64_t mkorchestra_urls_response_get_metadata_limit(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_metadata_next_url returns the next URL field
+/// of the metadata. It always returns a valid string owned by @p response,
+/// which MAY be an empty string. It aborts if passed a null pointer.
+const char *mkorchestra_urls_response_get_metadata_next_url(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_metadata_pages returns the pages field of
+/// the metadata. It will abort if passed a null pointer.
+int64_t mkorchestra_urls_response_get_metadata_pages(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_results_size returns the number of entries
+/// that have been returned as results. It will never return a negative number
+/// also in case of failure. It will abort if passed a null pointer.
+size_t mkorchestra_urls_response_get_results_size(
+    const mkorchestra_urls_response_t *response);
+
+/// mkorchestra_urls_response_get_result_category_code_at returns the category
+/// code of the results entry at @p idx. It always returns a valid string owned
+/// by @p response, which MAY be an empty string. It aborts if passed a null
+/// pointer and if the provided @p idx is out of bounds.
+const char *mkorchestra_urls_response_get_result_category_code_at(
+    const mkorchestra_urls_response_t *response, size_t idx);
+
+/// mkorchestra_urls_response_get_result_country_code_at returns the country
+/// code of the results entry at @p idx. It always returns a valid string owned
+/// by @p response, which MAY be an empty string. It aborts if passed a null
+/// pointer and if the provided @p idx is out of bounds.
+const char *mkorchestra_urls_response_get_result_country_code_at(
+    const mkorchestra_urls_response_t *response, size_t idx);
+
+/// mkorchestra_urls_response_get_result_url_at returns the URLof the results
+/// entry at @p idx. It always returns a valid string owned by @p response,
+/// which MAY be an empty string. It aborts if passed a null pointer and if the
+/// provided @p idx is out of bounds.
+const char *mkorchestra_urls_response_get_result_url_at(
+    const mkorchestra_urls_response_t *response, size_t idx);
+
+/// mkorchestra_urls_response_get_binary_logs returns the (possibly
+/// non UTF-8) logs in @p data and @p count. The byte array returned in @p
+/// data is owned by @p response and becomes invalid after @p response
+/// is deleted. It aborts if passed any null pointer argument.
+void mkorchestra_urls_response_get_binary_logs(
+    const mkorchestra_urls_response_t *response,
+    const uint8_t **data, size_t *count);
+
+/// mkorchestra_urls_response_delete destroys @p response. Note that
+/// @p response MAY be a null pointer.
+void mkorchestra_urls_response_delete(
+    mkorchestra_urls_response_t *response);
+
 #ifdef __cplusplus
 }  // extern "C"
 
+#include <deque>
 #include <memory>
+#include <regex>
+#include <sstream>
 #include <string>
 
 /// mkorchestra_metadata_deleter is a deleter for
@@ -687,6 +817,32 @@ struct mkorchestra_testhelpers_response_deleter {
 using mkorchestra_testhelpers_response_uptr = std::unique_ptr<
     mkorchestra_testhelpers_response_t, mkorchestra_testhelpers_response_deleter>;
 
+/// mkorchestra_urls_request_deleter is a deleter for
+/// mkorchestra_urls_request_t.
+struct mkorchestra_urls_request_deleter {
+  void operator()(mkorchestra_urls_request_t *s) {
+    mkorchestra_urls_request_delete(s);
+  }
+};
+
+/// mkorchestra_urls_request_uptr is a unique pointer to a
+/// mkorchestra_urls_request_t instance.
+using mkorchestra_urls_request_uptr = std::unique_ptr<
+    mkorchestra_urls_request_t, mkorchestra_urls_request_deleter>;
+
+/// mkorchestra_urls_response_deleter is a deleter for
+/// mkorchestra_urls_response_t.
+struct mkorchestra_urls_response_deleter {
+  void operator()(mkorchestra_urls_response_t *s) {
+    mkorchestra_urls_response_delete(s);
+  }
+};
+
+/// mkorchestra_urls_response_uptr is a unique pointer to a
+/// mkorchestra_urls_response_t instance.
+using mkorchestra_urls_response_uptr = std::unique_ptr<
+    mkorchestra_urls_response_t, mkorchestra_urls_response_deleter>;
+
 /// mkorchestra_register_response_moveout_logs moves the logs out of
 /// @p response. It aborts if passed a null pointer.
 std::string mkorchestra_register_response_moveout_logs(
@@ -711,6 +867,11 @@ std::string mkorchestra_collectors_response_moveout_logs(
 /// @p response. It aborts if passed a null pointer.
 std::string mkorchestra_testhelpers_response_moveout_logs(
     mkorchestra_testhelpers_response_uptr &response);
+
+/// mkorchestra_urls_response_moveout_logs moves the logs out of
+/// @p response. It aborts if passed a null pointer.
+std::string mkorchestra_urls_response_moveout_logs(
+    mkorchestra_urls_response_uptr &response);
 
 // The implementation can be included inline by defining this preprocessor
 // symbol. If you only care about API, you can stop reading here.
@@ -1695,6 +1856,318 @@ void mkorchestra_testhelpers_response_delete(
   delete response;
 }
 
+struct mkorchestra_urls_request {
+  int64_t limit = -1;
+  std::string country_code;
+  std::vector<std::string> category_codes;
+  std::string base_url;
+  std::string ca_bundle_path;
+  int64_t timeout = 30 /* seconds */;
+};
+
+struct mkorchestra_urls_result_entry {
+  std::string category_code;
+  std::string country_code;
+  std::string url;
+};
+
+struct mkorchestra_urls_response {
+  int64_t good = false;
+  struct {
+    int64_t count = -1;
+    int64_t current_page = -1;
+    int64_t limit = -1;
+    std::string next_url;
+    int64_t pages = -1;
+  } metadata;
+  std::vector<mkorchestra_urls_result_entry> results;
+  std::string logs;
+};
+
+mkorchestra_urls_request_t *mkorchestra_urls_request_new_nonnull() {
+  return new mkorchestra_urls_request_t;
+}
+
+void mkorchestra_urls_request_set_limit(
+    mkorchestra_urls_request_t *request,
+    int64_t limit) {
+  if (request == nullptr) {
+    abort();
+  }
+  request->limit = limit;
+}
+
+void mkorchestra_urls_request_set_country_code(
+    mkorchestra_urls_request_t *request,
+    const char *country_code) {
+  if (request == nullptr || country_code == nullptr) {
+    abort();
+  }
+  request->country_code = country_code;
+}
+
+void mkorchestra_urls_request_add_category_code(
+    mkorchestra_urls_request_t *request,
+    const char *category_code) {
+  if (request == nullptr || category_code == nullptr) {
+    abort();
+  }
+  request->category_codes.push_back(category_code);
+}
+
+void mkorchestra_urls_request_set_base_url(
+    mkorchestra_urls_request_t *request,
+    const char *base_url) {
+  if (request == nullptr || base_url == nullptr) {
+    abort();
+  }
+  request->base_url = base_url;
+}
+
+void mkorchestra_urls_request_set_ca_bundle_path(
+    mkorchestra_urls_request_t *request,
+    const char *ca_bundle_path) {
+  if (request == nullptr || ca_bundle_path == nullptr) {
+    abort();
+  }
+  request->ca_bundle_path = ca_bundle_path;
+}
+
+void mkorchestra_urls_request_set_timeout(
+    mkorchestra_urls_request_t *request,
+    int64_t timeout) {
+  if (request == nullptr) {
+    abort();
+  }
+  request->timeout = timeout;
+}
+
+// urls_make_query_string makes a string from the parameters in @p request and
+// returns whether the parameters are okay. Aborts if passed null args. Note
+// that the @p query parameter will be cleared and will be an empty string if
+// there are no parameters to be added to the query.
+static bool urls_make_query_string(const mkorchestra_urls_request_t *request,
+                                   std::string *query) {
+  if (request == nullptr || query == nullptr) {
+    abort();
+  }
+  *query = "";  // start over
+  std::deque<std::string> couples;
+  {
+    // Step 1: build a map from string to string with the query.
+    std::map<std::string, std::string> map;
+    {
+      // match checks whether @p s makes sense. Here the concern is not to
+      // precisely validates the codes but to guarantee that there are no
+      // unexpected characters requiring escaping of the query.
+      auto match = [](const std::string &s) -> bool {
+        std::smatch match;
+        std::regex re{R"(^[A-Z]{1,10}$)"};
+        return std::regex_match(s, match, re);
+      };
+      if (!request->country_code.empty()) {
+        if (!match(request->country_code)) return false;
+        map["country_code"] = request->country_code;
+      }
+      if (!request->category_codes.empty()) {
+        // Convert to a deque to enable easier processing.
+        std::deque<std::string> deque{request->category_codes.begin(),
+                                      request->category_codes.end()};
+        std::stringstream ss;
+        while (!deque.empty()) {
+          std::string s = std::move(deque.front());
+          deque.pop_front();
+          if (!match(s)) return false;
+          ss << s;
+          if (!deque.empty()) ss << ",";
+        }
+        map["category_codes"] = ss.str();
+      }
+      if (request->limit > 0) {
+        map["limit"] = std::to_string(request->limit);
+      }
+    }
+    // Step 2: join parameter name and parameter value into a vector
+    for (auto iter : map) {
+      std::stringstream ss;
+      ss << std::move(iter.first) << "=" << std::move(iter.second);
+      couples.push_back(ss.str());
+    }
+  }
+  // Step 3: add the question mark and join couples into a string
+  if (!couples.empty()) {
+    *query += "?";
+    while (!couples.empty()) {
+      std::string s = std::move(couples.front());
+      couples.pop_front();
+      *query += s;
+      if (!couples.empty()) *query += "&";
+    }
+  }
+  return true;
+}
+
+mkorchestra_urls_response_t *mkorchestra_urls_request_perform_nonnull(
+    const mkorchestra_urls_request_t *request) {
+  if (request == nullptr) {
+    abort();
+  }
+  mkorchestra_urls_response_uptr response{
+      new mkorchestra_urls_response_t};  // new cannot fail
+  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
+  mkcurl_request_set_ca_bundle_path_v2(
+      curl_request.get(), request->ca_bundle_path.c_str());
+  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
+  {
+    std::string url = request->base_url;
+    url += "/api/v1/urls";
+    {
+      std::string query;
+      if (!urls_make_query_string(request, &query)) {
+        response->logs += "The query string contains invalid arguments.\n";
+        return response.release();
+      }
+      url += query;
+    }
+    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+  }
+  mkcurl_response_uptr curl_response{
+      mkcurl_request_perform_nonnull(curl_request.get())};
+  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
+  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+    return response.release();
+  }
+  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+    return response.release();
+  }
+  {
+    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    response->logs += "Response body: ";
+    response->logs += body;
+    response->logs += "\n";
+    try {
+      nlohmann::json doc = nlohmann::json::parse(body);
+      response->metadata.count = doc.at("metadata").at("count");
+      response->metadata.current_page = doc.at("metadata").at("current_page");
+      response->metadata.limit = doc.at("metadata").at("limit");
+      response->metadata.next_url = doc.at("metadata").at("next_url");
+      response->metadata.pages = doc.at("metadata").at("pages");
+      for (auto entry : doc.at("results")) {
+        mkorchestra_urls_result_entry result;
+        result.category_code = entry.at("category_code");
+        result.country_code = entry.at("country_code");
+        result.url = entry.at("url");
+        response->results.push_back(std::move(result));
+      }
+    } catch (const std::exception &exc) {
+      response->logs += exc.what();
+      response->logs += "\n";
+      return response.release();
+    }
+  }
+  response->good = true;
+  return response.release();
+}
+
+void mkorchestra_urls_request_delete(mkorchestra_urls_request_t *request) {
+  delete request;
+}
+
+int64_t mkorchestra_urls_response_good(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->good;
+}
+
+int64_t mkorchestra_urls_response_get_metadata_count(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->metadata.count;
+}
+
+int64_t mkorchestra_urls_response_get_metadata_current_page(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->metadata.current_page;
+}
+
+int64_t mkorchestra_urls_response_get_metadata_limit(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->metadata.limit;
+}
+
+const char *mkorchestra_urls_response_get_metadata_next_url(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->metadata.next_url.c_str();
+}
+
+int64_t mkorchestra_urls_response_get_metadata_pages(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->metadata.pages;
+}
+
+size_t mkorchestra_urls_response_get_results_size(
+    const mkorchestra_urls_response_t *response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return response->results.size();
+}
+
+const char *mkorchestra_urls_response_get_result_category_code_at(
+    const mkorchestra_urls_response_t *response, size_t idx) {
+  if (response == nullptr || idx >= response->results.size()) {
+    abort();
+  }
+  return response->results[idx].category_code.c_str();
+}
+
+const char *mkorchestra_urls_response_get_result_country_code_at(
+    const mkorchestra_urls_response_t *response, size_t idx) {
+  if (response == nullptr || idx >= response->results.size()) {
+    abort();
+  }
+  return response->results[idx].country_code.c_str();
+}
+
+const char *mkorchestra_urls_response_get_result_url_at(
+    const mkorchestra_urls_response_t *response, size_t idx) {
+  if (response == nullptr || idx >= response->results.size()) {
+    abort();
+  }
+  return response->results[idx].url.c_str();
+}
+
+void mkorchestra_urls_response_get_binary_logs(
+    const mkorchestra_urls_response_t *response,
+    const uint8_t **data, size_t *count) {
+  if (response == nullptr || data == nullptr || count == nullptr) {
+    abort();
+  }
+  *data = (const uint8_t *)response->logs.c_str();
+  *count = response->logs.size();
+}
+
+void mkorchestra_urls_response_delete(
+    mkorchestra_urls_response_t *response) {
+  delete response;
+}
+
 std::string mkorchestra_register_response_moveout_logs(
     mkorchestra_register_response_uptr &response) {
   if (response == nullptr) {
@@ -1729,6 +2202,14 @@ std::string mkorchestra_collectors_response_moveout_logs(
 
 std::string mkorchestra_testhelpers_response_moveout_logs(
     mkorchestra_testhelpers_response_uptr &response) {
+  if (response == nullptr) {
+    abort();
+  }
+  return std::move(response->logs);
+}
+
+std::string mkorchestra_urls_response_moveout_logs(
+    mkorchestra_urls_response_uptr &response) {
   if (response == nullptr) {
     abort();
   }
