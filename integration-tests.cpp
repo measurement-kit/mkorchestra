@@ -138,9 +138,9 @@ TEST_CASE("We can get the available collectors") {
   {
     std::string logs = mkorchestra_collectors_response_moveout_logs(re);
     REQUIRE(logs.size() > 0);
-    std::clog << "=== BEGIN UPDATE LOGS ===" << std::endl;
+    std::clog << "=== BEGIN COLLECTORS LOGS ===" << std::endl;
     std::clog << logs;
-    std::clog << "=== END UPDATE LOGS ===" << std::endl;
+    std::clog << "=== END COLLECTORS LOGS ===" << std::endl;
   }
   REQUIRE(mkorchestra_collectors_response_good(re.get()));
   size_t n = mkorchestra_collectors_response_get_collectors_size(re.get());
@@ -169,9 +169,9 @@ TEST_CASE("We can get the available test-helpers") {
   {
     std::string logs = mkorchestra_testhelpers_response_moveout_logs(re);
     REQUIRE(logs.size() > 0);
-    std::clog << "=== BEGIN UPDATE LOGS ===" << std::endl;
+    std::clog << "=== BEGIN TESTHELPERS LOGS ===" << std::endl;
     std::clog << logs;
-    std::clog << "=== END UPDATE LOGS ===" << std::endl;
+    std::clog << "=== END TESTHELPERS LOGS ===" << std::endl;
   }
   REQUIRE(mkorchestra_testhelpers_response_good(re.get()));
   size_t n = mkorchestra_testhelpers_response_get_testhelpers_size(re.get());
@@ -187,4 +187,67 @@ TEST_CASE("We can get the available test-helpers") {
               << mkorchestra_testhelper_get_address(th.get())
               << std::endl;
   }
+}
+
+static void get_urls(std::string country_code,
+                    std::vector<std::string> category_codes,
+                    int64_t limit) {
+  mkorchestra_urls_request_uptr r{mkorchestra_urls_request_new_nonnull()};
+  mkorchestra_urls_request_set_base_url(r.get(), events_baseurl().c_str());
+  mkorchestra_urls_request_set_ca_bundle_path(r.get(), "ca-bundle.pem");
+  mkorchestra_urls_request_set_timeout(r.get(), 14);
+  if (!country_code.empty()) {
+    mkorchestra_urls_request_set_country_code(r.get(), country_code.c_str());
+  }
+  for (auto &s : category_codes) {
+    mkorchestra_urls_request_add_category_code(r.get(), s.c_str());
+  }
+  if (limit > 0) mkorchestra_urls_request_set_limit(r.get(), limit);
+  mkorchestra_urls_response_uptr re{
+      mkorchestra_urls_request_perform_nonnull(r.get())};
+  {
+    std::string logs = mkorchestra_urls_response_moveout_logs(re);
+    REQUIRE(logs.size() > 0);
+    std::clog << "=== BEGIN URLS LOGS ===" << std::endl;
+    std::clog << logs;
+    std::clog << "=== END URLS LOGS ===" << std::endl;
+  }
+  REQUIRE(mkorchestra_urls_response_good(re.get()));
+  std::clog << "metadata.count: "
+            << mkorchestra_urls_response_get_metadata_count(re.get())
+            << std::endl;
+  std::clog << "metadata.current_page: "
+            << mkorchestra_urls_response_get_metadata_current_page(re.get())
+            << std::endl;
+  std::clog << "metadata.limit: "
+            << mkorchestra_urls_response_get_metadata_limit(re.get())
+            << std::endl;
+  std::clog << "metadata.next_url: "
+            << mkorchestra_urls_response_get_metadata_next_url(re.get())
+            << std::endl;
+  std::clog << "metadata.pages: "
+            << mkorchestra_urls_response_get_metadata_pages(re.get())
+            << std::endl;
+  size_t n = mkorchestra_urls_response_get_results_size(re.get());
+  REQUIRE(n > 0);
+  for (size_t i = 0; i < n; ++i) {
+    std::clog << "- category_code: "
+              << mkorchestra_urls_response_get_result_category_code_at(
+									re.get(), i)
+              << " country_code: "
+              << mkorchestra_urls_response_get_result_country_code_at(
+									re.get(), i)
+              << " url: "
+              << mkorchestra_urls_response_get_result_url_at(
+									re.get(), i)
+              << std::endl;
+  }
+}
+
+TEST_CASE("We can get the URLs without query string params") {
+	get_urls("", {}, -1);
+}
+
+TEST_CASE("We can get the URLs with query string params") {
+	get_urls("IT", {"POLR", "HUMR"}, 7);
 }
