@@ -600,8 +600,7 @@ int64_t mkorchestra_urls_response_get_metadata_pages(
     const mkorchestra_urls_response_t *response);
 
 /// mkorchestra_urls_response_get_results_size returns the number of entries
-/// that have been returned as results. It will never return a negative number
-/// also in case of failure. It will abort if passed a null pointer.
+/// that have been returned as results. It will abort if passed a null pointer.
 size_t mkorchestra_urls_response_get_results_size(
     const mkorchestra_urls_response_t *response);
 
