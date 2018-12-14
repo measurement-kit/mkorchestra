@@ -1789,14 +1789,8 @@ mkorchestra_testhelpers_request_perform_nonnull(
       for (auto entry : doc.at("results")) {
         mkorchestra_testhelper_uptr th{new mkorchestra_testhelper_t};
         th->name = entry.at("name");
-        if (entry.at("address") == "https") {
-          response->logs += "Working around ooni/orchestra#54 issue.\n";
-          th->address = entry.at("type");
-          th->type = entry.at("address");
-        } else {
-          th->address = entry.at("address");
-          th->type = entry.at("type");
-        }
+        th->address = entry.at("address");
+        th->type = entry.at("type");
         response->helpers.push_back(std::move(th));
       }
     } catch (const std::exception &exc) {
