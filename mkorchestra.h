@@ -1465,7 +1465,7 @@ mkorchestra_update_response_t *mkorchestra_update_request_perform_nonnull(
     response->logs += "\n";
     std::swap(curl_request.body, body);
   }
-  mk::curl::Response curl_response;
+  mk::curl::Response curl_response = mk::curl::perform(curl_request);
   for (auto &log : curl_response.logs) {
     response->logs += log.line;
     response->logs += "\n";
