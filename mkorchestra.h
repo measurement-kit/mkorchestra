@@ -879,7 +879,7 @@ std::string mkorchestra_urls_response_moveout_logs(
 #include <vector>
 
 #include "json.hpp"
-#include "mkcurl.h"
+#include "mkcurl.hpp"
 
 #define MKORCHESTRA_CLIENT_METADATA(XX) \
   XX(std::string, available_bandwidth)  \
@@ -1087,17 +1087,15 @@ mkorchestra_register_response_t *mkorchestra_register_request_perform_nonnull(
   }
   mkorchestra_register_response_uptr response{
       new mkorchestra_register_response_t};  // new cannot fail
-  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
-  mkcurl_request_set_ca_bundle_path_v2(
-      curl_request.get(), request->ca_bundle_path.c_str());
-  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
-  mkcurl_request_set_method_post_v2(curl_request.get());
-  mkcurl_request_add_header_v2(
-      curl_request.get(), "Content-Type: application/json");
+  mk::curl::Request curl_request;
+  curl_request.ca_path = request->ca_bundle_path;
+  curl_request.timeout = request->timeout;
+  curl_request.method = "POST";
+  curl_request.headers.push_back("Content-Type: application/json");
   {
     std::string url = request->base_url;
     url += "/api/v1/register";
-    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+    curl_request.url = std::move(url);
   }
   {
     std::string body;
@@ -1121,19 +1119,21 @@ mkorchestra_register_response_t *mkorchestra_register_request_perform_nonnull(
     response->logs += "Request body: ";
     response->logs += body;
     response->logs += "\n";
-    mkcurl_request_movein_body_v2(curl_request, std::move(body));
+    std::swap(curl_request.body, body);
   }
-  mkcurl_response_uptr curl_response{
-      mkcurl_request_perform_nonnull(curl_request.get())};
-  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
-  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+  mk::curl::Response curl_response = mk::curl::perform(curl_request);
+  for (auto &log : curl_response.logs) {
+    response->logs += log.line;
+    response->logs += "\n";
+  }
+  if (curl_response.error != 0) {
     return response.release();
   }
-  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+  if (curl_response.status_code != 200) {
     return response.release();
   }
   {
-    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    std::string body = std::move(curl_response.body);
     response->logs += "Response body: ";
     response->logs += body;
     response->logs += "\n";
@@ -1257,17 +1257,15 @@ mkorchestra_login_response_t *mkorchestra_login_request_perform_nonnull(
   }
   mkorchestra_login_response_uptr response{
     new mkorchestra_login_response_t};  // new cannot fail
-  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
-  mkcurl_request_set_ca_bundle_path_v2(
-      curl_request.get(), request->ca_bundle_path.c_str());
-  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
-  mkcurl_request_set_method_post_v2(curl_request.get());
-  mkcurl_request_add_header_v2(
-      curl_request.get(), "Content-Type: application/json");
+  mk::curl::Request curl_request;
+  curl_request.ca_path = request->ca_bundle_path;
+  curl_request.timeout = request->timeout;
+  curl_request.method = "POST";
+  curl_request.headers.push_back("Content-Type: application/json");
   {
     std::string url = request->base_url;
     url += "/api/v1/login";
-    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+    std::swap(curl_request.url, url);
   }
   {
     std::string body;
@@ -1284,19 +1282,21 @@ mkorchestra_login_response_t *mkorchestra_login_request_perform_nonnull(
     response->logs += "Request body: ";
     response->logs += body;
     response->logs += "\n";
-    mkcurl_request_movein_body_v2(curl_request, std::move(body));
+    std::swap(curl_request.body, body);
   }
-  mkcurl_response_uptr curl_response{
-      mkcurl_request_perform_nonnull(curl_request.get())};
-  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
-  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+  mk::curl::Response curl_response = mk::curl::perform(curl_request);
+  for (auto &log : curl_response.logs) {
+    response->logs += log.line;
+    response->logs += "\n";
+  }
+  if (curl_response.error != 0) {
     return response.release();
   }
-  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+  if (curl_response.status_code != 200) {
     return response.release();
   }
   {
-    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    std::string body = std::move(curl_response.body);
     response->logs += "Response body: ";
     response->logs += body;
     response->logs += "\n";
@@ -1426,23 +1426,21 @@ mkorchestra_update_response_t *mkorchestra_update_request_perform_nonnull(
   }
   mkorchestra_update_response_uptr response{
       new mkorchestra_update_response_t};  // new cannot fail
-  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
-  mkcurl_request_set_ca_bundle_path_v2(
-      curl_request.get(), request->ca_bundle_path.c_str());
-  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
-  mkcurl_request_set_method_put_v2(curl_request.get());
-  mkcurl_request_add_header_v2(
-      curl_request.get(), "Content-Type: application/json");
+  mk::curl::Request curl_request;
+  curl_request.ca_path = request->ca_bundle_path;
+  curl_request.timeout = request->timeout;
+  curl_request.method = "PUT";
+  curl_request.headers.push_back("Content-Type: application/json");
   {
     std::string header = "Authorization: Bearer ";
     header += request->token;
-    mkcurl_request_add_header_v2(curl_request.get(), header.c_str());
+    curl_request.headers.push_back(std::move(header));
   }
   {
     std::string url = request->base_url;
     url += "/api/v1/update/";
     url += request->client_id;
-    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+    std::swap(curl_request.url, url);
   }
   {
     std::string body;
@@ -1465,19 +1463,21 @@ mkorchestra_update_response_t *mkorchestra_update_request_perform_nonnull(
     response->logs += "Request body: ";
     response->logs += body;
     response->logs += "\n";
-    mkcurl_request_movein_body_v2(curl_request, std::move(body));
+    std::swap(curl_request.body, body);
   }
-  mkcurl_response_uptr curl_response{
-      mkcurl_request_perform_nonnull(curl_request.get())};
-  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
-  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+  mk::curl::Response curl_response;
+  for (auto &log : curl_response.logs) {
+    response->logs += log.line;
+    response->logs += "\n";
+  }
+  if (curl_response.error != 0) {
     return response.release();
   }
-  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+  if (curl_response.status_code != 200) {
     return response.release();
   }
   {
-    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    std::string body = std::move(curl_response.body);
     response->logs += "Response body: ";
     response->logs += body;
     response->logs += "\n";
@@ -1588,26 +1588,27 @@ mkorchestra_collectors_request_perform_nonnull(
   }
   mkorchestra_collectors_response_uptr response{
       new mkorchestra_collectors_response_t};  // new cannot fail
-  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
-  mkcurl_request_set_ca_bundle_path_v2(
-      curl_request.get(), request->ca_bundle_path.c_str());
-  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
+  mk::curl::Request curl_request;
+  curl_request.ca_path = request->ca_bundle_path;
+  curl_request.timeout = request->timeout;
   {
     std::string url = request->base_url;
     url += "/api/v1/collectors";
-    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+    std::swap(curl_request.url, url);
   }
-  mkcurl_response_uptr curl_response{
-      mkcurl_request_perform_nonnull(curl_request.get())};
-  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
-  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+  mk::curl::Response curl_response = mk::curl::perform(curl_request);
+  for (auto &log : curl_response.logs) {
+    response->logs += log.line;
+    response->logs += "\n";
+  }
+  if (curl_response.error != 0) {
     return response.release();
   }
-  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+  if (curl_response.status_code != 200) {
     return response.release();
   }
   {
-    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    std::string body = std::move(curl_response.body);
     response->logs += "Response body: ";
     response->logs += body;
     response->logs += "\n";
@@ -1761,26 +1762,27 @@ mkorchestra_testhelpers_request_perform_nonnull(
   }
   mkorchestra_testhelpers_response_uptr response{
       new mkorchestra_testhelpers_response_t};  // new cannot fail
-  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
-  mkcurl_request_set_ca_bundle_path_v2(
-      curl_request.get(), request->ca_bundle_path.c_str());
-  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
+  mk::curl::Request curl_request;
+  curl_request.ca_path = request->ca_bundle_path;
+  curl_request.timeout = request->timeout;
   {
     std::string url = request->base_url;
     url += "/api/v1/test-helpers";
-    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+    std::swap(curl_request.url, url);
   }
-  mkcurl_response_uptr curl_response{
-      mkcurl_request_perform_nonnull(curl_request.get())};
-  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
-  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+  mk::curl::Response curl_response = mk::curl::perform(curl_request);
+  for (auto &log : curl_response.logs) {
+    response->logs += log.line;
+    response->logs += "\n";
+  }
+  if (curl_response.error != 0) {
     return response.release();
   }
-  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+  if (curl_response.status_code != 200) {
     return response.release();
   }
   {
-    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    std::string body = std::move(curl_response.body);
     response->logs += "Response body: ";
     response->logs += body;
     response->logs += "\n";
@@ -2007,10 +2009,9 @@ mkorchestra_urls_response_t *mkorchestra_urls_request_perform_nonnull(
   }
   mkorchestra_urls_response_uptr response{
       new mkorchestra_urls_response_t};  // new cannot fail
-  mkcurl_request_uptr curl_request{mkcurl_request_new_nonnull()};
-  mkcurl_request_set_ca_bundle_path_v2(
-      curl_request.get(), request->ca_bundle_path.c_str());
-  mkcurl_request_set_timeout_v2(curl_request.get(), request->timeout);
+  mk::curl::Request curl_request;
+  curl_request.ca_path = request->ca_bundle_path;
+  curl_request.timeout = request->timeout;
   {
     std::string url = request->base_url;
     url += "/api/v1/urls";
@@ -2022,19 +2023,21 @@ mkorchestra_urls_response_t *mkorchestra_urls_request_perform_nonnull(
       }
       url += query;
     }
-    mkcurl_request_set_url_v2(curl_request.get(), url.c_str());
+    std::swap(curl_request.url, url);
   }
-  mkcurl_response_uptr curl_response{
-      mkcurl_request_perform_nonnull(curl_request.get())};
-  response->logs += mkcurl_response_moveout_logs_v2(curl_response);
-  if (mkcurl_response_get_error_v2(curl_response.get()) != 0) {
+  mk::curl::Response curl_response = mk::curl::perform(curl_request);
+  for (auto &log : curl_response.logs) {
+    response->logs += log.line;
+    response->logs += "\n";
+  }
+  if (curl_response.error != 0) {
     return response.release();
   }
-  if (mkcurl_response_get_status_code_v2(curl_response.get()) != 200) {
+  if (curl_response.status_code != 200) {
     return response.release();
   }
   {
-    std::string body = mkcurl_response_moveout_body_v2(curl_response);
+    std::string body = std::move(curl_response.body);
     response->logs += "Response body: ";
     response->logs += body;
     response->logs += "\n";

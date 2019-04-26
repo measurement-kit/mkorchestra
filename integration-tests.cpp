@@ -3,7 +3,7 @@
 #include <iostream>
 
 #define MKCURL_INLINE_IMPL
-#include "mkcurl.h"
+#include "mkcurl.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -36,7 +36,7 @@ static std::string register_probe() {
   mkorchestra_register_request_set_base_url(
       r.get(), register_baseurl().c_str());
   mkorchestra_register_request_set_ca_bundle_path(
-      r.get(), "ca-bundle.pem");
+      r.get(), ".mkbuild/data/cacert.pem");
   mkorchestra_register_request_set_timeout(r.get(), 14);
   mkorchestra_register_response_uptr re{
       mkorchestra_register_request_perform_nonnull(r.get())};
@@ -66,7 +66,7 @@ static std::string login(std::string client_id) {
   mkorchestra_login_request_set_username(r.get(), client_id.c_str());
   mkorchestra_login_request_set_password(r.get(), get_password().c_str());
   mkorchestra_login_request_set_base_url(r.get(), register_baseurl().c_str());
-  mkorchestra_login_request_set_ca_bundle_path(r.get(), "ca-bundle.pem");
+  mkorchestra_login_request_set_ca_bundle_path(r.get(), ".mkbuild/data/cacert.pem");
   mkorchestra_login_request_set_timeout(r.get(), 14);
   mkorchestra_login_response_uptr re{
       mkorchestra_login_request_perform_nonnull(r.get())};
@@ -107,7 +107,7 @@ TEST_CASE("We can successfully update") {
   mkorchestra_update_request_set_base_url(
       r.get(), register_baseurl().c_str());
   mkorchestra_update_request_set_ca_bundle_path(
-      r.get(), "ca-bundle.pem");
+      r.get(), ".mkbuild/data/cacert.pem");
   mkorchestra_update_request_set_timeout(r.get(), 14);
   mkorchestra_update_response_uptr re{
       mkorchestra_update_request_perform_nonnull(r.get())};
@@ -131,7 +131,7 @@ TEST_CASE("We can get the available collectors") {
   mkorchestra_collectors_request_set_base_url(
       r.get(), events_baseurl().c_str());
   mkorchestra_collectors_request_set_ca_bundle_path(
-      r.get(), "ca-bundle.pem");
+      r.get(), ".mkbuild/data/cacert.pem");
   mkorchestra_collectors_request_set_timeout(r.get(), 14);
   mkorchestra_collectors_response_uptr re{
       mkorchestra_collectors_request_perform_nonnull(r.get())};
@@ -162,7 +162,7 @@ TEST_CASE("We can get the available test-helpers") {
   mkorchestra_testhelpers_request_set_base_url(
       r.get(), events_baseurl().c_str());
   mkorchestra_testhelpers_request_set_ca_bundle_path(
-      r.get(), "ca-bundle.pem");
+      r.get(), ".mkbuild/data/cacert.pem");
   mkorchestra_testhelpers_request_set_timeout(r.get(), 14);
   mkorchestra_testhelpers_response_uptr re{
       mkorchestra_testhelpers_request_perform_nonnull(r.get())};
@@ -194,7 +194,7 @@ static void get_urls(std::string country_code,
                     int64_t limit) {
   mkorchestra_urls_request_uptr r{mkorchestra_urls_request_new_nonnull()};
   mkorchestra_urls_request_set_base_url(r.get(), events_baseurl().c_str());
-  mkorchestra_urls_request_set_ca_bundle_path(r.get(), "ca-bundle.pem");
+  mkorchestra_urls_request_set_ca_bundle_path(r.get(), ".mkbuild/data/cacert.pem");
   mkorchestra_urls_request_set_timeout(r.get(), 14);
   if (!country_code.empty()) {
     mkorchestra_urls_request_set_country_code(r.get(), country_code.c_str());
