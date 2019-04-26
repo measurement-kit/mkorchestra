@@ -1,0 +1,24 @@
+name: mkorchestra
+
+docker: bassosimone/mk-debian
+
+dependencies:
+- curl.haxx.se/ca
+- github.com/catchorg/catch2
+- github.com/curl/curl
+- github.com/measurement-kit/mkcurl
+- github.com/measurement-kit/mkmock
+- github.com/nlohmann/json
+
+targets:
+  libraries:
+    mkorchestra:
+      compile: [mkorchestra.cpp]
+  executables:
+    integration-tests:
+      compile: [integration-tests.cpp]
+      link: [mkorchestra]
+
+tests:
+  integration_tests:
+    command: integration-tests
